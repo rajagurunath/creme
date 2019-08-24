@@ -62,8 +62,8 @@ class SVD(base.Recommender):
 
             >>> model = reco.SVD(
             ...     n_factors=10,
-            ...     row_optimizer=optim.VanillaSGD(0.005),
-            ...     col_optimizer=optim.VanillaSGD(0.005),
+            ...     row_optimizer=optim.SGD(0.005),
+            ...     col_optimizer=optim.SGD(0.005),
             ...     random_state=42
             ... )
 
@@ -71,7 +71,7 @@ class SVD(base.Recommender):
             ...     _ = model.fit_one(user, movie, rating)
 
             >>> model.predict_one('Bob', 'Harry Potter')
-            6.554339...
+            6.552539...
 
     """
 
@@ -79,8 +79,8 @@ class SVD(base.Recommender):
                  loss=None, l2=0., random_state=None):
 
         self.n_factors = n_factors
-        self.row_optimizer = optim.VanillaSGD() if row_optimizer is None else row_optimizer
-        self.col_optimizer = optim.VanillaSGD() if col_optimizer is None else row_optimizer
+        self.row_optimizer = optim.SGD() if row_optimizer is None else row_optimizer
+        self.col_optimizer = optim.SGD() if col_optimizer is None else row_optimizer
         self.loss = optim.SquaredLoss() if loss is None else row_optimizer
         self.l2 = l2
         self.global_mean = stats.Mean()
@@ -98,8 +98,8 @@ class SVD(base.Recommender):
 
     def fit_one(self, r_id, c_id, y):
 
-        self.row_optimizer.update_before_pred(self.row_biases)
-        self.col_optimizer.update_before_pred(self.col_biases)
+        self.row_optimizer.update_before_pred(w=self.row_biases)
+        self.col_optimizer.update_before_pred(w=self.col_biases)
 
         # Predict the value
         y_pred = self.predict_one(r_id, c_id)

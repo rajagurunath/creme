@@ -39,8 +39,8 @@ class FMRegressor(base.Regressor):
 
             >>> for x, y in stream.iter_numpy(features[5:], target[5:]):
             ...     print(fm.predict_one(x), y)
-            5.240102... 1
-            7.303011... 5
+            -8.355825... 1
+            -11.355220... 5
 
     """
 
@@ -57,7 +57,7 @@ class FMRegressor(base.Regressor):
             intercept = stats.Mean()
         self.intercept = intercept
 
-        optimizer = optim.VanillaSGD(0.01) if optimizer is None else optimizer
+        optimizer = optim.SGD(0.01) if optimizer is None else optimizer
         self.weights_optimizer = copy.deepcopy(optimizer)
         self.latents_optimizer = copy.deepcopy(optimizer)
 

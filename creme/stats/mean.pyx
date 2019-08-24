@@ -1,8 +1,10 @@
+cimport base
+
 from . import base
 from . import summing
 
 
-class Mean(base.Univariate):
+cdef class Mean(base.Univariate):
     """Running mean.
 
     Attributes:
@@ -28,20 +30,16 @@ class Mean(base.Univariate):
 
     """
 
-    def __init__(self, n=0, mean=0):
+    def __init__(self, n=0, mean=0.):
         self.n = n
         self.mean = mean
 
-    @property
-    def name(self):
-        return 'mean'
-
-    def update(self, x):
+    cpdef Mean update(self, double x):
         self.n += 1
-        self.mean += (x - self.mean) / self.n if self.n > 0 else 0
+        self.mean += (x - self.mean) / self.n
         return self
 
-    def get(self):
+    cpdef double get(self):
         return self.mean
 
 
@@ -80,10 +78,6 @@ class RollingMean(summing.RollingSum):
             5.0
 
     """
-
-    @property
-    def name(self):
-        return f'rolling_{self.window_size}_mean'
 
     def get(self):
         return super().get() / len(self) if len(self) > 0 else 0

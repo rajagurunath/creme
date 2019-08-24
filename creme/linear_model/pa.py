@@ -57,7 +57,8 @@ class PARegressor(BasePA, base.Regressor):
             >>> model = linear_model.PARegressor(
             ...     C=0.01,
             ...     mode=2,
-            ...     eps=0.1
+            ...     eps=0.1,
+            ...     fit_intercept=False
             ... )
             >>> metric = metrics.MAE() + metrics.MSE()
 
@@ -74,14 +75,14 @@ class PARegressor(BasePA, base.Regressor):
 
     """
 
-    def __init__(self, C=0.01, mode=1, eps=0.1, fit_intercept=False):
+    def __init__(self, C=1.0, mode=1, eps=0.1, fit_intercept=True):
         super().__init__(C=C, mode=mode, fit_intercept=fit_intercept)
         self.loss = optim.EpsilonInsensitiveHingeLoss(eps=eps)
 
     def fit_one(self, x, y):
 
         y_pred = self.predict_one(x)
-        tau = self.calc_tau(x, self.loss(y, y_pred))
+        tau = self.calc_tau(x, self.loss.eval(y, y_pred))
         step = tau * np.sign(y - y_pred)
 
         for i, xi in x.items():
@@ -150,14 +151,14 @@ class PAClassifier(BasePA, base.BinaryClassifier):
 
     """
 
-    def __init__(self, C=0.01, mode=1, fit_intercept=True):
+    def __init__(self, C=1.0, mode=1, fit_intercept=True):
         super().__init__(C=C, mode=mode, fit_intercept=fit_intercept)
         self.loss = optim.HingeLoss()
 
     def fit_one(self, x, y):
 
         y_pred = utils.dot(x, self.weights) + self.intercept
-        tau = self.calc_tau(x, self.loss(y, y_pred))
+        tau = self.calc_tau(x, self.loss.eval(y, y_pred))
         step = tau * (y or -1)  # y == False becomes -1
 
         for i, xi in x.items():

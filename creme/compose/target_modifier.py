@@ -6,7 +6,7 @@ from .. import base
 __all__ = ['TargetModifierRegressor', 'BoxCoxTransformRegressor']
 
 
-class TargetModifierRegressor(base.Regressor):
+class TargetModifierRegressor(base.Regressor, base.Wrapper):
     """Model wrapper that modifies the target before training.
 
     The user is expected to check that ``func`` and ``inverse_func`` are coherent with each other.
@@ -37,7 +37,7 @@ class TargetModifierRegressor(base.Regressor):
             >>> model = compose.Pipeline([
             ...     ('scale', preprocessing.StandardScaler()),
             ...     ('learn', compose.TargetModifierRegressor(
-            ...         regressor=linear_model.LinearRegression(),
+            ...         regressor=linear_model.LinearRegression(intercept_lr=0.15),
             ...         func=math.log,
             ...         inverse_func=math.exp
             ...     ))
@@ -45,7 +45,7 @@ class TargetModifierRegressor(base.Regressor):
             >>> metric = metrics.MSE()
 
             >>> model_selection.online_score(X_y, model, metric)
-            MSE: 36.149014
+            MSE: 37.499423
 
     """
 
@@ -53,6 +53,10 @@ class TargetModifierRegressor(base.Regressor):
         self.regressor = regressor
         self.func = func
         self.inverse_func = inverse_func
+
+    @property
+    def _model(self):
+        return self.regressor
 
     def fit_one(self, x, y):
         self.regressor.fit_one(x, self.func(y))
@@ -104,7 +108,7 @@ class BoxCoxTransformRegressor(TargetModifierRegressor):
             >>> metric = metrics.MSE()
 
             >>> model_selection.online_score(X_y, model, metric)
-            MSE: 34.768331
+            MSE: 37.225174
 
     """
 

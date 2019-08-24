@@ -60,7 +60,7 @@ As for dependencies, `creme` mostly relies on Python's standard library. Sometim
 
 In the following example we'll use a linear regression to forecast the number of available bikes in [bike stations](https://www.wikiwand.com/en/Bicycle-sharing_system) from the city of Toulouse :bike:.
 
-We'll use the available numeric features, as well as calculate running averages of the target. Before being fed to the linear regression, the features will be scaled using a `StandardScaler`. Note that each of these steps works in a streaming fashion, including the feature extraction. We'll evaluate the model by asking it to forecast 30 minutes ahead and delaying the true answers, which ensures that we're simulating a production scenario. Finally we will print the current score every 20,000 predictions.
+We'll use the available numeric features, as well as calculate running averages of the target. Before being fed to the linear regression, the features will be scaled using a `StandardScaler`. Note that each of these steps works in a streaming fashion, including the feature extraction. We'll evaluate the model by asking it to forecast 30 minutes ahead while delaying the true answers, which ensures that we're simulating a production scenario. Finally we will print the current score every 20,000 predictions.
 
 ```python
 >>> import datetime as dt
@@ -86,7 +86,7 @@ We'll use the available numeric features, as well as calculate running averages 
 ... )
 >>> model += feature_extraction.TargetAgg(by='station', how=stats.EWMean(0.5))
 >>> model |= preprocessing.StandardScaler()
->>> model |= linear_model.LinearRegression(intercept_lr=0.5)
+>>> model |= linear_model.LinearRegression()
 
 >>> model_selection.online_qa_score(
 ...     X_y=X_y,
@@ -94,18 +94,15 @@ We'll use the available numeric features, as well as calculate running averages 
 ...     metric=metrics.MAE(),
 ...     on='moment',
 ...     lag=dt.timedelta(minutes=30),
-...     print_every=20_000
+...     print_every=30_000
 ... )
-[20,000] MAE: 2.205013
-[40,000] MAE: 2.228264
-[60,000] MAE: 2.2746
-[80,000] MAE: 2.304324
-[100,000] MAE: 2.318586
-[120,000] MAE: 2.301552
-[140,000] MAE: 2.288296
-[160,000] MAE: 2.315333
-[180,000] MAE: 2.32161
-MAE: 2.325374
+[30,000] MAE: 2.193069
+[60,000] MAE: 2.249345
+[90,000] MAE: 2.288321
+[120,000] MAE: 2.265257
+[150,000] MAE: 2.2674
+[180,000] MAE: 2.282485
+MAE: 2.285921
 
 ```
 
@@ -122,21 +119,114 @@ We can also draw the model to understand how the data flows through.
 
 By only using a few lines of code, we've built a robust model and evaluated it by simulating a production scenario. You can find a more detailed version of this example [here](https://creme-ml.github.io/notebooks/bike-sharing-forecasting.html). `creme` is a framework that has a lot to offer, and as such we kindly refer you to the [documentation](https://creme-ml.github.io/) if you want to know more.
 
-## Comparison with other solutions
+## Benchmarks
 
-- [scikit-learn](https://scikit-learn.org/stable/): [Some](https://scikit-learn.org/stable/modules/computing.html#incremental-learning) of it's estimators have a `partial_fit` method which allows them to update themselves with new observations. However, online learning isn't treated as a first class citizen, which can make things awkward. You should definitely use scikit-learn if your data fits in memory and that you can afford retraining your model from scratch every time new data is available.
-- [Vowpal Wabbit](https://github.com/VowpalWabbit/vowpal_wabbit/wiki): VW is probably the fastest out-of-core learning system available. At it's core it implements a state-of-the-art adaptive gradient descent algorithm with many tricks. It also has some mechanisms for doing [active learning](https://www.wikiwand.com/en/Active_learning_(machine_learning)) and using [bandits](https://www.wikiwand.com/en/Multi-armed_bandit). However it isn't a "true" online learning system as it assumes the data is available in a file and can be looped over multiple times. Also it is somewhat difficult to [grok](https://www.wikiwand.com/en/Grok) for newcomers.
-- [LIBOL](https://github.com/LIBOL/SOL): This is a good library written by academics with some great documentation. It's written in C++ and seems to be pretty fast. However it only focuses on the learning aspect of online learning, not on other mundane yet useful tasks such as feature extraction and preprocessing. Moreover it hasn't been updated for a few years.
-- [Spark Streaming](https://spark.apache.org/docs/latest/streaming-programming-guide.html): This is an extension of [Apache Spark](https://www.wikiwand.com/en/Apache_Spark) which caters to big data practitioners. It processes data in mini-batches instead of actually doing real streaming operations. It also has some compatibility with the [MLlib](https://spark.apache.org/docs/latest/ml-guide.html) for implementing online learning algorithms, such as [streaming linear regression](https://spark.apache.org/docs/latest/mllib-linear-methods.html#streaming-linear-regression) and [streaming k-means](https://spark.apache.org/docs/latest/mllib-clustering.html#streaming-k-means). However it is a somewhat overwhelming solution which might be a bit overkill for certain use cases.
-- [TensorFlow](https://www.wikiwand.com/en/TensorFlow): Deep learning systems are in some sense online learning systems because they use online gradient descent. However, popular libraries are mostly attuned to batch situations. Because frameworks such as [Keras](https://keras.io/) and [PyTorch](https://pytorch.org/) are so popular and very well backed, there is no real point in implementing neural networks in creme. Additionally, for a lot of problems neural networks might not be the right tool, and you might want to use a simple logistic regression or a decision tree (for which online algorithms exist).
+All the benchmarks, including reproducible code, are available [here](benchmarks).
 
-Feel free to open an issue if you feel like other solutions are worth mentioning.
+The following table summarizes the performance of regression methods from various libraries, using their default parameters.
+
+<table border="0" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Library</th>
+      <th>Model</th>
+      <th>MSE</th>
+      <th>Fit time</th>
+      <th>Average fit time</th>
+      <th>Predict time</th>
+      <th>Average predict time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>creme</td>
+      <td><code>LinearRegression</code></td>
+      <td>118.549437</td>
+      <td>2s, 580ms</td>
+      <td>10μs</td>
+      <td>759ms</td>
+      <td>3μs</td>
+    </tr>
+    <tr>
+      <td>creme</td>
+      <td><code>PARegressor</code></td>
+      <td>143.477210</td>
+      <td>6s, 994ms</td>
+      <td>27μs</td>
+      <td>1s, 305ms</td>
+      <td>5μs</td>
+    </tr>
+    <tr>
+      <td>creme</td>
+      <td><code>KNeighborsRegressor</code></td>
+      <td>155.585250</td>
+      <td>394ms</td>
+      <td>1μs</td>
+      <td>37s, 4ms</td>
+      <td>146μs</td>
+    </tr>
+    <tr>
+      <td>scikit-learn</td>
+      <td><code>SGDRegressor</code></td>
+      <td>120.185848</td>
+      <td>36s, 433ms</td>
+      <td>144μs</td>
+      <td>14s, 766ms</td>
+      <td>58μs</td>
+    </tr>
+    <tr>
+      <td>scikit-learn</td>
+      <td><code>PassiveAggressiveRegressor</code></td>
+      <td>143.477210</td>
+      <td>35s, 551ms</td>
+      <td>141μs</td>
+      <td>14s, 599ms</td>
+      <td>57μs</td>
+    </tr>
+    <tr>
+      <td>PyTorch (CPU)</td>
+      <td><code>Linear</code></td>
+      <td>142.495995</td>
+      <td>47s, 335ms</td>
+      <td>187μs</td>
+      <td>14s, 822ms</td>
+      <td>58μs</td>
+    </tr>
+    <tr>
+      <td>Keras on Tensorflow (CPU)</td>
+      <td><code>Dense</td>
+      <td>142.494512</td>
+      <td>1m, 18s, 296ms</td>
+      <td>310μs</td>
+      <td>49s, 225ms</td>
+      <td>195μs</td>
+    </tr>
+    <tr>
+      <td>scikit-garden</td>
+      <td><code>MondrianTreeRegressor</code></td>
+      <td>201.687033</td>
+      <td>35s, 983ms</td>
+      <td>142μs</td>
+      <td>23s, 502ms</td>
+      <td>93μs</td>
+    </tr>
+    <tr>
+      <td>scikit-garden</td>
+      <td><code>MondrianForestRegressor</code></td>
+      <td>142.364156</td>
+      <td>5m, 58s, 226ms</td>
+      <td>1ms, 420μs</td>
+      <td>2m, 40s, 728ms</td>
+      <td>637μs</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Contributing
 
-Like many subfields of machine learning, online learning is far from being an exact science and so there is still a lot to do. Feel free to contribute in any way you like, we're always open to new ideas and approaches. If you want to contribute to the code base please check out the [`CONTRIBUTING.md` file](`CONTRIBUTING.md`). Also take a look at the [issue tracker](https://github.com/creme-ml/creme/issues) and see if anything takes your fancy.
+Like many subfields of machine learning, online learning is far from being an exact science and so there is still a lot to do. Feel free to contribute in any way you like, we're always open to new ideas and approaches. If you want to contribute to the code base please check out the [`CONTRIBUTING.md` file](CONTRIBUTING.md). Also take a look at the [issue tracker](https://github.com/creme-ml/creme/issues) and see if anything takes your fancy.
 
-Last but not least you are more than welcome to share with us how you're using `creme` or online learning in general! We believe that online learning solves a lot of pain points in practice and we would love to share experiences.
+Last but not least you are more than welcome to share with us on how you're using `creme` or online learning in general! We believe that online learning solves a lot of pain points in practice, and would love to share experiences.
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
 

@@ -1,8 +1,11 @@
+cimport base
+cimport mean
+
 from . import base
 from . import mean
 
 
-class Var(base.Univariate):
+cdef class Var(base.Univariate):
     """Running variance using Welford's algorithm.
 
     Parameters:
@@ -37,32 +40,28 @@ class Var(base.Univariate):
 
     """
 
+    cdef readonly long ddof
+    cdef readonly mean.Mean mean
+    cdef readonly double sos
+
     def __init__(self, ddof=1):
         self.ddof = ddof
         self.mean = mean.Mean()
         self.sos = 0.
 
-    @property
-    def name(self):
-        return 'variance'
-
-    @property
-    def n(self):
-        return self.mean.n
-
-    def update(self, x):
+    cpdef Var update(self, double x):
         mean = self.mean.get()
         self.mean.update(x)
         self.sos += (x - mean) * (x - self.mean.get())
         return self
 
-    def get(self):
-        if self.sos:
-            return self.sos / (self.n - self.ddof)
+    cpdef double get(self):
+        if self.mean.n > self.ddof:
+            return self.sos / (self.mean.n - self.ddof)
         return 0.
 
 
-class RollingVar(base.Univariate):
+class RollingVar(base.RollingUnivariate):
     """Running variance over a window.
 
     Parameters:
@@ -111,10 +110,6 @@ class RollingVar(base.Univariate):
     @property
     def window_size(self):
         return self.rolling_mean.window_size
-
-    @property
-    def name(self):
-        return f'rolling_{self.rolling_mean.size}_variance'
 
     def update(self, x):
         if len(self.rolling_mean) >= self.rolling_mean.size:

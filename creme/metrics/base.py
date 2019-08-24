@@ -19,14 +19,14 @@ class Metric(abc.ABC):
     def get(self) -> float:
         """Returns the current value of the metric."""
 
-    @abc.abstractmethod
-    def works_with(self, model) -> bool:
-        """Tells if a metric can work with a given model or not."""
-
     @property
     @abc.abstractmethod
     def bigger_is_better(self) -> bool:
         """Indicates if a high value is better than a low one or not."""
+
+    @abc.abstractmethod
+    def works_with(self, model) -> bool:
+        """Indicates whether or not a metric can work with a given model."""
 
     def __str__(self):
         """Returns the class name along with the current value of the metric."""
@@ -72,7 +72,7 @@ class MultiClassMetric(BinaryMetric):
         """Updates the metric."""
 
     def works_with(self, model) -> bool:
-        return isinstance(model, (base.BinaryClassifier, base.MultiClassifier))
+        return isinstance(model, base.Classifier)
 
 
 class RegressionMetric(Metric):
@@ -140,7 +140,7 @@ class Metrics(Metric, collections.UserList):
     def get(self):
         return [m.get() for m in self]
 
-    def works_with(self, model):
+    def works_with(self, model) -> bool:
         return all(m.works_with(model) for m in self)
 
     @property

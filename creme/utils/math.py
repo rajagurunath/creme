@@ -35,10 +35,13 @@ def dot(x: dict, y: dict):
         >>> x = {'x0': 1, 'x1': 2}
         >>> y = {'x1': 21, 'x2': 3}
         >>> dot(x, y)
-        42
+        42.0
 
     """
-    return sum(xi * y.get(i, 0) for i, xi in min(x, y, key=len).items())
+
+    if len(x) < len(y):
+        return sum(xi * y.get(i, 0.) for i, xi in x.items())
+    return sum(x.get(i, 0.) * yi for i, yi in y.items())
 
 
 def chain_dot(*xs):

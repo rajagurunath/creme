@@ -4,7 +4,7 @@ from .. import base
 from .. import stats
 
 
-class Detrender(base.Regressor):
+class Detrender(base.Regressor, base.Wrapper):
     """A simple detrender which centers the target.
 
     Parameters:
@@ -17,7 +17,7 @@ class Detrender(base.Regressor):
         self.mean = stats.Mean()
 
     @property
-    def model(self):
+    def _model(self):
         return self.regressor
 
     def fit_one(self, x, y):
@@ -29,7 +29,7 @@ class Detrender(base.Regressor):
         return self.regressor.predict_one(x) + self.mean.get()
 
 
-class GroupDetrender(base.Regressor):
+class GroupDetrender(base.Regressor, base.Wrapper):
     """Remove the trend of the target inside each group.
 
     Parameters:
@@ -44,7 +44,7 @@ class GroupDetrender(base.Regressor):
         self.means = collections.defaultdict(stats.Mean)
 
     @property
-    def model(self):
+    def _model(self):
         return self.regressor
 
     def fit_one(self, x, y):

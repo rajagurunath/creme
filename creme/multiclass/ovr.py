@@ -61,6 +61,9 @@ class OneVsRestClassifier(collections.UserDict, base.MultiClassifier):
         super().__init__()
         self.binary_classifier = binary_classifier
 
+    def __str__(self):
+        return f'OneVsRestClassifier({self.binary_classifier})'
+
     def fit_one(self, x, y):
 
         # Instantiate a new binary classifier if the class is new
@@ -79,6 +82,3 @@ class OneVsRestClassifier(collections.UserDict, base.MultiClassifier):
             for label, model in self.items()
         }
         return utils.softmax(y_pred)
-
-    def __str__(self):
-        return f'OneVsRest({self.binary_classifier})'

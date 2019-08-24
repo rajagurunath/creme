@@ -10,17 +10,17 @@ from .. import base
 __all__ = ['BaggingClassifier', 'BaggingRegressor']
 
 
-class BaseBagging(base.Wrapper, collections.UserList):
+class BaseBagging(collections.UserList, base.Wrapper):
 
-    def __init__(self, model=None, n_models=10, random_state=None):
+    def __init__(self, model, n_models=10, random_state=None):
         super().__init__()
-        self._model = model
+        self.model = model
         self.extend([copy.deepcopy(model) for _ in range(n_models)])
         self.rng = utils.check_random_state(random_state)
 
     @property
-    def model(self):
-        return self._model
+    def _model(self):
+        return self.model
 
     def fit_one(self, x, y):
 
@@ -86,9 +86,6 @@ class BaggingClassifier(BaseBagging, base.Classifier):
 
     """
 
-    def __str__(self):
-        return f'BaggingClassifier({str(self.model)})'
-
     def predict_proba_one(self, x):
         """Averages the predictions of each classifier."""
 
@@ -142,22 +139,19 @@ class BaggingRegressor(BaseBagging, base.Regressor):
             ... )
             >>> model = preprocessing.StandardScaler()
             >>> model |= ensemble.BaggingRegressor(
-            ...     model=linear_model.LinearRegression(),
+            ...     model=linear_model.LinearRegression(intercept_lr=0.1),
             ...     n_models=3,
             ...     random_state=42
             ... )
             >>> metric = metrics.MAE()
 
             >>> model_selection.online_score(X_y, model, metric)
-            MAE: 4.501659
+            MAE: 4.26101
 
     References:
         1. `Online Bagging and Boosting <https://ti.arc.nasa.gov/m/profile/oza/files/ozru01a.pdf>`_
 
     """
-
-    def __str__(self):
-        return f'BaggingRegressor({str(self.model)})'
 
     def predict_one(self, x):
         """Averages the predictions of each regressor."""

@@ -158,12 +158,6 @@ class Pipeline(collections.OrderedDict):
 
     @property
     def __class__(self):
-        """Returns the class of the final estimator for type checking purposes.
-
-        A Pipeline is semantically equivalent to it's final estimator in terms of usage. This is
-        mostly used for deceiving the ``isinstance`` method.
-
-        """
         return self.final_estimator.__class__
 
     @property
@@ -352,7 +346,7 @@ class Pipeline(collections.OrderedDict):
             # Wrapper models are unrolled
             if isinstance(step, base.Wrapper):
                 return Network(
-                    nodes=[networkify(step.model)],
+                    nodes=[networkify(step._model)],
                     links=[],
                     directed=True,
                     name=type(step).__name__

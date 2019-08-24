@@ -10,6 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Metrics can now be composed using the `+` operator, which is useful for evaluating multiple metrics
 - `LogisticRegression` and `LinearRegression` now have a `intercept_lr` parameter
+- `KNeighborsRegressor` to `neighbors`
+
+### Modified
+
+- Renamed `optim.VanillaSGD` to `optim.SGD`
+- Fixed a bug where `utils.dot` could take longer than necessary
+- Cythonized `stats.Mean` and `stats.Var`
+- Cythonized all the loss functions in `optim`
+- `CountVectorizer` and `TFIDFVectorizer` won't raise an error when being pickled anymore
+- Tests are now much more extensive, thanks mostly to estimator tags
 
 ## [0.3.0](https://pypi.org/project/creme/0.3.0/) - 2019-06-23
 
@@ -32,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     - `RegressionMultiOutput`
     - `MCC`
     - `RollingMCC`
-    - `AUC`
+    - `ROCAUC`
 - `Multinomial` to `proba`
 - `HedgeRegressor` and `StackingBinaryClassifier` to `ensemble`
 - `QuantileLoss` and `MiniBatcher` to `optim`

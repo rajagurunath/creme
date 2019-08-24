@@ -27,7 +27,7 @@ class BaseHedge(collections.UserList):
         # Make a prediction and update the weights accordingly for each model
         for i, model in enumerate(self):
             y_pred = self._get_prediction(model, x)
-            loss = self.loss(y, y_pred)
+            loss = self.loss.eval(y, y_pred)
             self.weights[i] *= math.exp(-self.learning_rate * loss)
             model.fit_one(x, y)
 
@@ -147,18 +147,17 @@ class HedgeRegressor(BaseHedge, base.Regressor):
             ...     preprocessing.StandardScaler() |
             ...     ensemble.HedgeRegressor(
             ...         regressors=[
-            ...             lin_reg(optimizer=optim.VanillaSGD(0.05)),
-            ...             lin_reg(optimizer=optim.RMSProp()),
-            ...             lin_reg(optimizer=optim.AdaGrad())
-            ...         ],
-            ...         learning_rate=0.9
+            ...             lin_reg(optimizer=optim.SGD(0.01), intercept_lr=0.1),
+            ...             lin_reg(optimizer=optim.RMSProp(), intercept_lr=0.1),
+            ...             lin_reg(optimizer=optim.AdaGrad(), intercept_lr=0.1)
+            ...         ]
             ...     )
             ... )
 
             >>> metric = metrics.MAE()
 
             >>> model_selection.online_score(X_y, model, metric)
-            MAE: 3.155537
+            MAE: 3.253601
 
     References:
         1. `Online Learning from Experts: Weighed Majority and Hedge <https://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/20-scribe1.pdf>`_

@@ -22,7 +22,7 @@ class Optimizer(abc.ABC):
     def _update_after_pred(self, w: dict, g: dict) -> dict:
         raise NotImplementedError
 
-    def update_after_pred(self, w: dict, g: dict):
+    def update_after_pred(self, w: dict, g: dict) -> dict:
 
         # Update the weights
         w = self._update_after_pred(w, g)

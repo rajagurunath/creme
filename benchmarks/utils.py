@@ -6,7 +6,7 @@ import pandas as pd
 import tqdm
 
 
-def pprint_ns(d):
+def format_ns(d):
 
     units = collections.OrderedDict({'ns': 1})
     units['μs'] = 1000 * units['ns']
@@ -34,7 +34,7 @@ def benchmark(get_X_y, n, get_pp, models, get_metric):
     Result = collections.namedtuple('Result', 'lib model score fit_time pred_time')
     results = []
 
-    for lib, name, model in tqdm.tqdm(models):
+    for lib, name, model in tqdm.tqdm_notebook(models):
 
         pp = get_pp()
         metric = get_metric()
@@ -46,7 +46,7 @@ def benchmark(get_X_y, n, get_pp, models, get_metric):
         if isinstance(model, base.Classifier) and not metric.requires_labels:
             pred_func = model.predict_proba_one
 
-        for x, y in tqdm.tqdm(get_X_y(), total=n):
+        for x, y in tqdm.tqdm_notebook(get_X_y(), total=n):
 
             x = pp.fit_one(x, y).transform_one(x)
 
@@ -69,11 +69,10 @@ def benchmark(get_X_y, n, get_pp, models, get_metric):
         'Library': [r.lib for r in results],
         'Model': [r.model for r in results],
         metric.__class__.__name__: [r.score for r in results],
-        'Fit time': [pprint_ns(r.fit_time) for r in results],
-        'Average fit time': [pprint_ns(round(r.fit_time / n)) for r in results],
-        'Predict time': [pprint_ns(r.pred_time) for r in results],
-        'Average predict time': [pprint_ns(round(r.pred_time / n)) for r in results]
+        'Fit time': [format_ns(r.fit_time) for r in results],
+        'Average fit time': [format_ns(round(r.fit_time / n)) for r in results],
+        'Predict time': [format_ns(r.pred_time) for r in results],
+        'Average predict time': [format_ns(round(r.pred_time / n)) for r in results]
     })
 
-    print()
-    print(results)
+    return results

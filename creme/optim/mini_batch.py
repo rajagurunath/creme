@@ -37,7 +37,7 @@ class MiniBatcher(base.Optimizer):
             ...     shuffle=True,
             ...     random_state=42
             ... )
-            >>> optimizer = optim.MiniBatcher(optim.VanillaSGD(0.1), 4)
+            >>> optimizer = optim.MiniBatcher(optim.SGD(0.1), 4)
             >>> model = (
             ...     preprocessing.StandardScaler() |
             ...     linear_model.LogisticRegression(optimizer)
