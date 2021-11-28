@@ -1,107 +1,83 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-# Note: To use the 'upload' functionality of this file, you must:
-#   $ pip install twine
-
 import io
 import os
+import platform
+import subprocess
 import sys
-from shutil import rmtree
 
-from setuptools import Extension, find_packages, setup, Command
-from Cython.Build import cythonize
+import setuptools
+
+try:
+    from numpy import get_include
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
+    from numpy import get_include
+
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "Cython"])
+    from Cython.Build import cythonize
+
 
 # Package meta-data.
-NAME = 'creme'
-DESCRIPTION = 'Incremental machine learning in Python'
-LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-URL = 'https://github.com/creme-ml/creme'
-EMAIL = 'maxhalford25@gmail.com'
-AUTHOR = 'Max Halford'
-REQUIRES_PYTHON = '>=3.6.0'
-VERSION = None
+NAME = "river"
+DESCRIPTION = "Online machine learning in Python"
+LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
+URL = "https://github.com/online-ml/river"
+EMAIL = "maxhalford25@gmail.com"
+AUTHOR = "Max Halford"
+REQUIRES_PYTHON = ">=3.7.0"
 
 # Package requirements.
-base_packages = ['numpy>=1.16.4', 'scipy>=1.3.0', 'scikit-learn>=0.21.2']
+base_packages = ["numpy>=1.18.1", "scipy>=1.4.1", "pandas>=1.0.1"]
 
-dev_packages = [
-    'Cython>=0.29.6',
-    'graphviz>=0.10.1',
-    'ipykernel>=4.8.2',
-    'jupyter-client>=5.2.3',
-    'matplotlib>=3.0.2',
-    'nbval>=0.9.1',
-    'pytest>=4.5.0',
-    'pytest-cov>=2.6.1',
-    'pytest-cython>=0.1.0',
-    'nbsphinx>=0.4.2',
-    'Sphinx>=2.0.1',
-    'sphinx-rtd-theme>=0.4.3'
+compat_packages = base_packages + [
+    "scikit-learn",
+    "scikit-surprise",
+    "sqlalchemy>=1.4",
+    "torch",
+    "vaex",
 ]
 
-# The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
-# Except, perhaps the License and Trove Classifiers!
-# If you do change the License, remember to change the Trove Classifier for that!
+dev_packages = base_packages + [
+    "asv",
+    "graphviz>=0.10.1",
+    "matplotlib>=3.0.2",
+    "mypy>=0.761",
+    "pre-commit>=2.9.2",
+    "pytest>=4.5.0",
+    "pytest-cov>=2.6.1",
+    "scikit-learn>=1.0.1",
+    "sqlalchemy>=1.4",
+]
+
+docs_packages = dev_packages + [
+    "flask",
+    "ipykernel",
+    "jupyter-client",
+    "mike==0.5.3",
+    "mkdocs",
+    "mkdocs-awesome-pages-plugin",
+    "mkdocs-material",
+    "nbconvert",
+    "spacy",
+]
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-# Note: this will only work if 'README.rst' is present in your MANIFEST.in file!
-with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = '\n' + f.read()
+with io.open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+    long_description = "\n" + f.read()
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
-if not VERSION:
-    with open(os.path.join(here, NAME, '__version__.py')) as f:
-        exec(f.read(), about)
-else:
-    about['__version__'] = VERSION
-
-
-class UploadCommand(Command):
-    """Support setup.py upload."""
-
-    description = 'Build and publish the package.'
-    user_options = []
-
-    @staticmethod
-    def status(s):
-        """Prints things in bold."""
-        print('\033[1m{0}\033[0m'.format(s))
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        try:
-            self.status('Removing previous builds…')
-            rmtree(os.path.join(here, 'dist'))
-        except OSError:
-            pass
-
-        self.status('Building Source and Wheel (universal) distribution…')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
-
-        self.status('Uploading the package to PyPi via Twine…')
-        os.system('twine upload dist/*')
-
-        self.status('Pushing git tags…')
-        os.system('git tag v{0}'.format(about['__version__']))
-        os.system('git push --tags')
-
-        sys.exit()
-
+with open(os.path.join(here, NAME, "__version__.py")) as f:
+    exec(f.read(), about)
 
 # Where the magic happens:
-setup(
+setuptools.setup(
     name=NAME,
-    version=about['__version__'],
+    version=about["__version__"],
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
@@ -109,33 +85,60 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=('tests',)),
-    # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
-
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    packages=setuptools.find_packages(exclude=("tests",)),
     install_requires=base_packages,
-    extras_require={'dev': dev_packages},
+    extras_require={
+        "dev": dev_packages,
+        "compat": compat_packages,
+        "docs": docs_packages,
+        "extra": [f"river_extra=={about['__version__']}"],
+        ":python_version == '3.6'": ["dataclasses"],
+    },
     include_package_data=True,
-    license='BSD-3',
+    license="BSD-3",
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
     ],
-    # $ setup.py publish support.
-    cmdclass={
-        'upload': UploadCommand,
-    },
-    ext_modules=cythonize([
-        Extension('*', sources=['**/*.pyx'], libraries=['m'])
-    ])
+    ext_modules=cythonize(
+        module_list=[
+            setuptools.Extension(
+                "*",
+                sources=["**/*.pyx"],
+                include_dirs=[get_include()],
+                libraries=[] if platform.system() == "Windows" else ["m"],
+                define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+            )
+        ],
+        compiler_directives={
+            "language_level": 3,
+            "binding": True,
+            "embedsignature": True,
+        },
+    )
+    + [
+        setuptools.Extension(
+            "river.neighbors.libNearestNeighbor",
+            sources=[
+                os.path.join(
+                    "river",
+                    "neighbors",
+                    "src",
+                    "libNearestNeighbor",
+                    "nearestNeighbor.cpp",
+                )
+            ],
+            include_dirs=[get_include()],
+            libraries=[] if platform.system() == "Windows" else ["m"],
+            language="c++",
+        )
+    ],
 )

@@ -1,0 +1,42 @@
+name: pypi
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  pypi:
+    strategy:
+      matrix:
+        platform: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    env:
+      CIBW_BUILD: "cp37-* cp38-* cp39-*"
+      CIBW_BEFORE_BUILD: "pip install cython"
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: |
+          pip install wheel
+          pip install -e ".[compat,dev]" cibuildwheel twine
+
+      - name: Download datasets
+        run: python -c "from river import datasets; datasets.CreditCard().download()"
+
+      - name: pytest
+        run: |
+          pytest
+
+      - name: Build wheels
+        run: |
+          cibuildwheel --output-dir dist
+          python setup.py sdist
+          ls dist
+          twine upload dist/* -u ${{ secrets.pypi_user }} -p ${{ secrets.pypi_password }} --skip-existing

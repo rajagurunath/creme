@@ -1,6 +1,12 @@
 # Documentation
-docs/_build/
-docs/generated/
+docs/getting-started/getting-started.md
+docs/getting-started/getting-started_files/
+docs/user-guide/*.md
+docs/user-guide/*_files/
+docs/examples/*.md
+docs/examples/*_files/
+docs/api/
+site
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -16,7 +22,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-!creme/dist/*.py
+!river/dist/*.py
 downloads/
 eggs/
 .eggs/
@@ -48,6 +54,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+*.sqlite
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -92,9 +99,18 @@ dmypy.json
 
 # For convenience
 /*.ipynb
+/*.csv*
+/*.arff
+/*.pkl
 test.py
 
 # For all-contributors
 yarn.lock
 node_modules/
 package.json
+
+# For MacOS
+.DS_store
+
+# ASV
+benchmarks/.asv

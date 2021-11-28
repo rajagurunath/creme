@@ -1,255 +1,220 @@
-<div align="center">
-  <img height="240px" src="https://docs.google.com/drawings/d/e/2PACX-1vSl80T4MnWRsPX3KvlB2kn6zVdHdUleG_w2zBiLS7RxLGAHxiSYTnw3LZtXh__YMv6KcIOYOvkSt9PB/pub?w=841&h=350" alt="creme_logo"/>
-</div>
+</br>
 
-<div align="center">
-  <!-- Travis -->
-  <a href="https://travis-ci.org/creme-ml/creme">
-    <img src="https://img.shields.io/travis/creme-ml/creme/master.svg?style=for-the-badge" alt="travis" />
+<p align="center">
+  <img height="80px" src="docs/img/logo.svg" alt="river_logo">
+</p>
+
+</br>
+
+<p align="center">
+  <!-- Tests -->
+  <a href="https://github.com/online-ml/river/actions/workflows/unit-tests.yml">
+    <img src="https://github.com/online-ml/river/actions/workflows/unit-tests.yml/badge.svg" alt="tests">
   </a>
-  <!-- Codecov -->
-  <a href="https://codecov.io/gh/creme-ml/creme">
-    <img src="https://img.shields.io/codecov/c/gh/creme-ml/creme.svg?style=for-the-badge" alt="codecov" />
+  <!-- Code coverage -->
+  <a href="https://codecov.io/gh/online-ml/river">
+    <img src="https://codecov.io/gh/online-ml/river/branch/main/graph/badge.svg?token=luK6eFoMa9"/>
   </a>
-  <!-- Codacy -->
-  <a href="https://www.codacy.com/app/MaxHalford/creme">
-    <img src="https://img.shields.io/codacy/grade/56da6d188f4a417da0b7eaa435303862.svg?style=for-the-badge" alt="codecov" />
+  <!-- Documentation -->
+  <a href="https://riverml.xyz">
+    <img src="https://img.shields.io/website?label=docs&style=flat-square&url=https%3A%2F%2Friverml.xyz%2F" alt="documentation">
+  </a>
+  <!-- Roadmap -->
+  <a href="https://www.notion.so/d1e86fcdf21e4deda16eedab2b3361fb?v=503f44740b8b44a99a961aa96e9e46e1">
+    <img src="https://img.shields.io/website?label=roadmap&style=flat-square&url=https://www.notion.so/d1e86fcdf21e4deda16eedab2b3361fb?v=503f44740b8b44a99a961aa96e9e46e1" alt="roadmap">
   </a>
   <!-- PyPI -->
-  <a href="https://pypi.org/project/creme">
-    <img src="https://img.shields.io/pypi/v/creme.svg?style=for-the-badge" alt="pypi" />
+  <a href="https://pypi.org/project/river">
+    <img src="https://img.shields.io/pypi/v/river.svg?label=release&color=blue&style=flat-square" alt="pypi">
+  </a>
+  <!-- PePy -->
+  <a href="https://pepy.tech/project/river">
+    <img src="https://static.pepy.tech/badge/river?style=flat-square" alt="pepy">
   </a>
   <!-- License -->
   <a href="https://opensource.org/licenses/BSD-3-Clause">
-    <img src="https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=for-the-badge" alt="bsd_3_license"/>
+    <img src="https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square" alt="bsd_3_license">
   </a>
-</div>
+</p>
 
-<br/>
+</br>
 
-`creme` is a library for online machine learning, also known as in**creme**ntal learning. Online learning is a machine learning regime where a model learns one observation at a time. This is in contrast to batch learning where all the data is processed in one go. Incremental learning is desirable when the data is too big to fit in memory, or simply when you want to handle data in a streaming fashion. In addition to many online machine learning algorithms, `creme` provides utilities for extracting features from a stream of data. The API is heavily inspired from that of [scikit-learn](https://scikit-learn.org/stable/), meaning that users who are familiar with it should feel comfortable.
+<p align="center">
+  River is a Python library for <a href="https://www.wikiwand.com/en/Online_machine_learning">online machine learning</a>. It is the result of a merger between <a href="https://github.com/MaxHalford/creme">creme</a> and <a href="https://github.com/scikit-multiflow/scikit-multiflow">scikit-multiflow</a>. River's ambition is to be the go-to library for doing machine learning on streaming data.
+</p>
 
-## Useful links
+## ⚡️ Quickstart
 
-- [Documentation](https://creme-ml.github.io/)
-  - [API reference](https://creme-ml.github.io/api.html)
-  - [User guide](https://creme-ml.github.io/user-guide.html)
-  - [FAQ](https://creme-ml.github.io/faq.html)
-- [Issue tracker](https://github.com/creme-ml/creme/issues)
-- [Package releases](https://pypi.org/project/creme/#history)
-- [Change history](CHANGELOG.md)
-- PyData Amsterdam 2019 presentation ([slides](https://maxhalford.github.io/slides/creme-pydata/), [video](https://www.youtube.com/watch?v=P3M6dt7bY9U&list=PLGVZCDnMOq0q7_6SdrC2wRtdkojGBTAht&index=11))
-- [Toulouse Data Science presentation](https://maxhalford.github.io/slides/creme-tds/)
-- [Blog post from pyimagesearch for image classification](https://www.pyimagesearch.com/2019/06/17/online-incremental-learning-with-keras-and-creme/)
-
-## Installation
-
-:point_up: `creme` is intended to work with Python 3.6 and above.
-
-`creme` can simply be installed with `pip`.
-
-    pip install creme
-
-You can also install the latest development version as so:
-
-    pip install git+https://github.com/creme-ml/creme --upgrade
-
-As for dependencies, `creme` mostly relies on Python's standard library. Sometimes it relies on `numpy`, `scipy`, and `scikit-learn` to avoid reinventing the wheel.
-
-## Quick example
-
-In the following example we'll use a linear regression to forecast the number of available bikes in [bike stations](https://www.wikiwand.com/en/Bicycle-sharing_system) from the city of Toulouse :bike:.
-
-We'll use the available numeric features, as well as calculate running averages of the target. Before being fed to the linear regression, the features will be scaled using a `StandardScaler`. Note that each of these steps works in a streaming fashion, including the feature extraction. We'll evaluate the model by asking it to forecast 30 minutes ahead while delaying the true answers, which ensures that we're simulating a production scenario. Finally we will print the current score every 20,000 predictions.
+As a quick example, we'll train a logistic regression to classify the [website phishing dataset](http://archive.ics.uci.edu/ml/datasets/Website+Phishing). Here's a look at the first observation in the dataset.
 
 ```python
->>> import datetime as dt
->>> from creme import compose
->>> from creme import datasets
->>> from creme import feature_extraction
->>> from creme import linear_model
->>> from creme import metrics
->>> from creme import model_selection
->>> from creme import preprocessing
->>> from creme import stats
+>>> from pprint import pprint
+>>> from river import datasets
 
->>> X_y = datasets.fetch_bikes()
+>>> dataset = datasets.Phishing()
 
->>> def add_hour(x):
-...     x['hour'] = x['moment'].hour
-...     return x
-
->>> model = compose.Whitelister('clouds', 'humidity', 'pressure', 'temperature', 'wind')
->>> model += (
-...     add_hour |
-...     feature_extraction.TargetAgg(by=['station', 'hour'], how=stats.Mean())
-... )
->>> model += feature_extraction.TargetAgg(by='station', how=stats.EWMean(0.5))
->>> model |= preprocessing.StandardScaler()
->>> model |= linear_model.LinearRegression()
-
->>> model_selection.online_qa_score(
-...     X_y=X_y,
-...     model=model,
-...     metric=metrics.MAE(),
-...     on='moment',
-...     lag=dt.timedelta(minutes=30),
-...     print_every=30_000
-... )
-[30,000] MAE: 2.193069
-[60,000] MAE: 2.249345
-[90,000] MAE: 2.288321
-[120,000] MAE: 2.265257
-[150,000] MAE: 2.2674
-[180,000] MAE: 2.282485
-MAE: 2.285921
+>>> for x, y in dataset:
+...     pprint(x)
+...     print(y)
+...     break
+{'age_of_domain': 1,
+ 'anchor_from_other_domain': 0.0,
+ 'empty_server_form_handler': 0.0,
+ 'https': 0.0,
+ 'ip_in_url': 1,
+ 'is_popular': 0.5,
+ 'long_url': 1.0,
+ 'popup_window': 0.0,
+ 'request_from_other_domain': 0.0}
+True
 
 ```
 
-We can also draw the model to understand how the data flows through.
+Now let's run the model on the dataset in a streaming fashion. We sequentially interleave predictions and model updates. Meanwhile, we update a performance metric to see how well the model is doing.
 
 ```python
->>> dot = model.draw()
+>>> from river import compose
+>>> from river import linear_model
+>>> from river import metrics
+>>> from river import preprocessing
+
+>>> model = compose.Pipeline(
+...     preprocessing.StandardScaler(),
+...     linear_model.LogisticRegression()
+... )
+
+>>> metric = metrics.Accuracy()
+
+>>> for x, y in dataset:
+...     y_pred = model.predict_one(x)      # make a prediction
+...     metric = metric.update(y, y_pred)  # update the metric
+...     model = model.learn_one(x, y)      # make the model learn
+
+>>> metric
+Accuracy: 89.20%
 
 ```
 
-<div align="center">
-  <img src="docs/_static/bikes_pipeline.svg" alt="bikes_pipeline"/>
-</div>
+## 🛠 Installation
 
-By only using a few lines of code, we've built a robust model and evaluated it by simulating a production scenario. You can find a more detailed version of this example [here](https://creme-ml.github.io/notebooks/bike-sharing-forecasting.html). `creme` is a framework that has a lot to offer, and as such we kindly refer you to the [documentation](https://creme-ml.github.io/) if you want to know more.
+River is intended to work with **Python 3.6 or above**. Installation can be done with `pip`:
 
-## Benchmarks
+```sh
+pip install river
+```
 
-All the benchmarks, including reproducible code, are available [here](benchmarks).
+There are [wheels available](https://pypi.org/project/river/#files) for Linux, MacOS, and Windows, which means that you most probably won't have to build River from source.
 
-The following table summarizes the performance of regression methods from various libraries, using their default parameters.
+You can install the latest development version from GitHub as so:
 
-<table border="0" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>Library</th>
-      <th>Model</th>
-      <th>MSE</th>
-      <th>Fit time</th>
-      <th>Average fit time</th>
-      <th>Predict time</th>
-      <th>Average predict time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>creme</td>
-      <td><code>LinearRegression</code></td>
-      <td>118.549437</td>
-      <td>2s, 580ms</td>
-      <td>10μs</td>
-      <td>759ms</td>
-      <td>3μs</td>
-    </tr>
-    <tr>
-      <td>creme</td>
-      <td><code>PARegressor</code></td>
-      <td>143.477210</td>
-      <td>6s, 994ms</td>
-      <td>27μs</td>
-      <td>1s, 305ms</td>
-      <td>5μs</td>
-    </tr>
-    <tr>
-      <td>creme</td>
-      <td><code>KNeighborsRegressor</code></td>
-      <td>155.585250</td>
-      <td>394ms</td>
-      <td>1μs</td>
-      <td>37s, 4ms</td>
-      <td>146μs</td>
-    </tr>
-    <tr>
-      <td>scikit-learn</td>
-      <td><code>SGDRegressor</code></td>
-      <td>120.185848</td>
-      <td>36s, 433ms</td>
-      <td>144μs</td>
-      <td>14s, 766ms</td>
-      <td>58μs</td>
-    </tr>
-    <tr>
-      <td>scikit-learn</td>
-      <td><code>PassiveAggressiveRegressor</code></td>
-      <td>143.477210</td>
-      <td>35s, 551ms</td>
-      <td>141μs</td>
-      <td>14s, 599ms</td>
-      <td>57μs</td>
-    </tr>
-    <tr>
-      <td>PyTorch (CPU)</td>
-      <td><code>Linear</code></td>
-      <td>142.495995</td>
-      <td>47s, 335ms</td>
-      <td>187μs</td>
-      <td>14s, 822ms</td>
-      <td>58μs</td>
-    </tr>
-    <tr>
-      <td>Keras on Tensorflow (CPU)</td>
-      <td><code>Dense</td>
-      <td>142.494512</td>
-      <td>1m, 18s, 296ms</td>
-      <td>310μs</td>
-      <td>49s, 225ms</td>
-      <td>195μs</td>
-    </tr>
-    <tr>
-      <td>scikit-garden</td>
-      <td><code>MondrianTreeRegressor</code></td>
-      <td>201.687033</td>
-      <td>35s, 983ms</td>
-      <td>142μs</td>
-      <td>23s, 502ms</td>
-      <td>93μs</td>
-    </tr>
-    <tr>
-      <td>scikit-garden</td>
-      <td><code>MondrianForestRegressor</code></td>
-      <td>142.364156</td>
-      <td>5m, 58s, 226ms</td>
-      <td>1ms, 420μs</td>
-      <td>2m, 40s, 728ms</td>
-      <td>637μs</td>
-    </tr>
-  </tbody>
-</table>
+```sh
+pip install git+https://github.com/online-ml/river --upgrade
+```
 
-## Contributing
+Or, through SSH:
 
-Like many subfields of machine learning, online learning is far from being an exact science and so there is still a lot to do. Feel free to contribute in any way you like, we're always open to new ideas and approaches. If you want to contribute to the code base please check out the [`CONTRIBUTING.md` file](CONTRIBUTING.md). Also take a look at the [issue tracker](https://github.com/creme-ml/creme/issues) and see if anything takes your fancy.
+```sh
+pip install git+ssh://git@github.com/online-ml/river.git --upgrade
+```
 
-Last but not least you are more than welcome to share with us on how you're using `creme` or online learning in general! We believe that online learning solves a lot of pain points in practice, and would love to share experiences.
+## 🧠 Philosophy
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
+Machine learning is often done in a batch setting, whereby a model is fitted to a dataset in one go. This results in a static model which has to be retrained in order to learn from new data. In many cases, this isn't elegant nor efficient, and usually incurs [a fair amount of technical debt](https://research.google/pubs/pub43146/). Indeed, if you're using a batch model, then you need to think about maintaining a training set, monitoring real-time performance, model retraining, etc.
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore -->
-<table>
-  <tr>
-    <td align="center"><a href="https://maxhalford.github.io"><img src="https://avatars1.githubusercontent.com/u/8095957?v=4" width="100px;" alt="Max Halford"/><br /><sub><b>Max Halford</b></sub></a><br /><a href="#projectManagement-MaxHalford" title="Project Management">📆</a> <a href="https://github.com/Max Halford/creme/commits?author=MaxHalford" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/AdilZouitine"><img src="https://avatars0.githubusercontent.com/u/24889239?v=4" width="100px;" alt="AdilZouitine"/><br /><sub><b>AdilZouitine</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=AdilZouitine" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/raphaelsty"><img src="https://avatars3.githubusercontent.com/u/24591024?v=4" width="100px;" alt="Raphael Sourty"/><br /><sub><b>Raphael Sourty</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=raphaelsty" title="Code">💻</a></td>
-    <td align="center"><a href="http://www.linkedin.com/in/gbolmier"><img src="https://avatars0.githubusercontent.com/u/25319692?v=4" width="100px;" alt="Geoffrey Bolmier"/><br /><sub><b>Geoffrey Bolmier</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=gbolmier" title="Code">💻</a></td>
-    <td align="center"><a href="http://koaning.io"><img src="https://avatars1.githubusercontent.com/u/1019791?v=4" width="100px;" alt="vincent d warmerdam "/><br /><sub><b>vincent d warmerdam </b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=koaning" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/VaysseRobin"><img src="https://avatars2.githubusercontent.com/u/32324822?v=4" width="100px;" alt="VaysseRobin"/><br /><sub><b>VaysseRobin</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=VaysseRobin" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/tweakyllama"><img src="https://avatars0.githubusercontent.com/u/7049400?v=4" width="100px;" alt="Lygon Bowen-West"/><br /><sub><b>Lygon Bowen-West</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=tweakyllama" title="Code">💻</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/flegac"><img src="https://avatars2.githubusercontent.com/u/4342302?v=4" width="100px;" alt="Florent Le Gac"/><br /><sub><b>Florent Le Gac</b></sub></a><br /><a href="https://github.com/Max Halford/creme/commits?author=flegac" title="Code">💻</a></td>
-    <td align="center"><a href="http://www.pyimagesearch.com"><img src="https://avatars2.githubusercontent.com/u/759645?v=4" width="100px;" alt="Adrian Rosebrock"/><br /><sub><b>Adrian Rosebrock</b></sub></a><br /><a href="#blog-jrosebr1" title="Blogposts">📝</a></td>
-  </tr>
-</table>
+With River, we encourage a different approach, which is to continuously learn a stream of data. This means that the model process one observation at a time, and can therefore be updated on the fly. This allows to learn from massive datasets that don't fit in main memory. Online machine learning also integrates nicely in cases where new data is constantly arriving. It shines in many use cases, such as time series forecasting, spam filtering, recommender systems, CTR prediction, and IoT applications. If you're bored with retraining models and want to instead build dynamic models, then online machine learning (and therefore River!) might be what you're looking for.
 
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+Here are some benefits of using River (and online machine learning in general):
 
-## License
+- **Incremental**: models can update themselves in real-time.
+- **Adaptive**: models can adapt to [concept drift](https://www.wikiwand.com/en/Concept_drift).
+- **Production-ready**: working with data streams makes it simple to replicate production scenarios during model development.
+- **Efficient**: models don't have to be retrained and require little compute power, which [lowers their carbon footprint](https://arxiv.org/abs/1907.10597)
+- **Fast**: when the goal is to learn and predict with a single instance at a time, then River is an order of magnitude faster than PyTorch, Tensorflow, and scikit-learn.
 
-See the [license file](LICENSE).
+## 🔥 Features
+
+- Linear models with a wide array of optimizers
+- Nearest neighbors, decision trees, naïve Bayes
+- [Progressive model validation](https://hunch.net/~jl/projects/prediction_bounds/progressive_validation/coltfinal.pdf)
+- Model pipelines as a first-class citizen
+- Anomaly detection
+- Recommender systems
+- Time series forecasting
+- Imbalanced learning
+- Clustering
+- Feature extraction and selection
+- Online statistics and metrics
+- Built-in datasets
+- And [much more](https://riverml.xyz/latest/api/overview/)
+
+## 🔗 Useful links
+
+- [Documentation](https://riverml.xyz)
+- [Benchmarks](https://github.com/online-ml/river/tree/main/benchmarks)
+- [Issue tracker](https://github.com/online-ml/river/issues)
+- [Package releases](https://pypi.org/project/river/#history)
+
+## 👁️ Media
+
+- PyData Amsterdam 2019 presentation ([slides](https://maxhalford.github.io/slides/creme-pydata), [video](https://www.youtube.com/watch?v=P3M6dt7bY9U&list=PLGVZCDnMOq0q7_6SdrC2wRtdkojGBTAht&index=11))
+- [Toulouse Data Science Meetup presentation](https://maxhalford.github.io/slides/creme-tds)
+- [Machine learning for streaming data with creme](https://towardsdatascience.com/machine-learning-for-streaming-data-with-creme-dacf5fb469df)
+- [Hong Kong Data Science Meetup presentation](https://maxhalford.github.io/slides/hkml2020.pdf)
+
+## 👍 Contributing
+
+Feel free to contribute in any way you like, we're always open to new ideas and approaches.
+
+There are three ways for users to get involved:
+
+- [Issue tracker](https://github.com/online-ml/river/issues): this place is meant to report bugs, request for minor features, or small improvements. Issues should be short-lived and solved as fast as possible.
+- [Discussions](https://github.com/online-ml/river/discussions): you can ask for new features, submit your questions and get help, propose new ideas, or even show the community what you are achieving with River! If you have a new technique or want to port a new functionality to River, this is the place to discuss.
+- [Roadmap](https://www.notion.so/d1e86fcdf21e4deda16eedab2b3361fb?v=503f44740b8b44a99a961aa96e9e46e1): you can check what we are doing, what are the next planned milestones for River, and look for cool ideas that still need someone to make them become a reality!
+
+Please check out the [contribution guidelines](https://github.com/online-ml/river/blob/main/CONTRIBUTING.md) if you want to bring modifications to the code base. You can view the list of people who have contributed [here](https://github.com/online-ml/river/graphs/contributors).
+
+## ❤️ They've used us
+
+These are companies that we know have been using River, be it in production or for prototyping.
+
+<p align="center">
+  <img width="70%" src="https://docs.google.com/drawings/d/e/2PACX-1vQbCUQkTU74dBf411r4nDl4udmqOEbLqzRtokUC-N7JDJUA7BGTfnMGmiMNqbcSuOaWAmazp1rFGwDC/pub?w=1194&h=567" alt="companies">
+</p>
+
+Feel welcome to get in touch if you want us to add your company logo!
+
+## 🤝 Affiliations
+
+**Sponsors**
+
+<p align="center">
+  <img width="55%" src="https://docs.google.com/drawings/d/e/2PACX-1vSagEhWAjDsb0c24En_fhWAf9DJZbyh5YjU7lK0sNowD2m9uv9TuFm-U77k6ObqTyN2mP05Avf6TCJc/pub?w=2073&h=1127" alt="sponsors">
+</p>
+
+**Collaborating institutions and groups**
+
+<p align="center">
+  <img width="55%" src="https://docs.google.com/drawings/d/e/2PACX-1vQB0C8YgnkCt_3C3cp-Csaw8NLZUwishdbJFB3iSbBPUD0AxEVS9AlF-Rs5PJq8UVRzRtFwZIOucuXj/pub?w=1442&h=489" alt="collaborations">
+</p>
+
+## 💬 Citation
+
+If `river` has been useful for your research and you would like to cite it in an scientific publication, please refer to this [paper](https://arxiv.org/abs/2012.04740):
+
+```bibtex
+@misc{2020river,
+      title={River: machine learning for streaming data in Python},
+      author={Jacob Montiel and Max Halford and Saulo Martiello Mastelini
+              and Geoffrey Bolmier and Raphael Sourty and Robin Vaysse
+              and Adil Zouitine and Heitor Murilo Gomes and Jesse Read
+              and Talel Abdessalem and Albert Bifet},
+      year={2020},
+      eprint={2012.04740},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+```
+
+## 📝 License
+
+River is free and open-source software licensed under the [3-clause BSD license](https://github.com/online-ml/river/blob/main/LICENSE).
